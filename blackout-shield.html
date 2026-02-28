@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLACKOUT SHIELD — Ukraine Air Defense</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oxanium:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a06;
+  --panel: #0a1410;
+  --panel2: #0d1c16;
+  --border: #1a3525;
+  --green: #00ff88;
+  --green2: #00cc66;
+  --green-dim: #003322;
+  --amber: #ffb300;
+  --amber-dim: #332500;
+  --red: #ff3333;
+  --red-dim: #330a0a;
+  --blue: #00aaff;
+  --white: #c8e8d0;
+  --dim: #4a7a5a;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-main: 'Oxanium', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: crosshair;
+}
+/* SCREENS */
+.screen { display: none; width: 100vw; height: 100vh; }
+.screen.active { display: flex; }
+
+/* ===== TITLE SCREEN ===== */
+#title-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a1e12 0%, #050a06 70%);
+  position: relative;
+  overflow: hidden;
+}
+.title-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridScroll 20s linear infinite;
+}
+@keyframes gridScroll { from { transform: translateY(0); } to { transform: translateY(40px); } }
+.title-scanline {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  animation: scanline 4s linear infinite;
+  opacity: 0.3;
+}
+@keyframes scanline { from { top: -2px; } to { top: 100%; } }
+.title-content { position: relative; z-index: 1; text-align: center; }
+.title-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 6px;
+  margin-bottom: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.title-main {
+  font-family: var(--font-main);
+  font-size: 72px;
+  font-weight: 800;
+  color: var(--green);
+  text-shadow: 0 0 40px rgba(0,255,136,0.5), 0 0 80px rgba(0,255,136,0.2);
+  letter-spacing: 4px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.title-sub {
+  font-family: var(--font-main);
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--dim);
+  letter-spacing: 8px;
+  margin-bottom: 48px;
+}
+.title-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; }
+.btn-primary {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.btn-primary:hover { background: var(--green); color: var(--bg); box-shadow: 0 0 20px rgba(0,255,136,0.4); }
+.btn-secondary {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  padding: 14px 40px;
+  background: transparent;
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.btn-secondary:hover { background: var(--amber); color: var(--bg); }
+.title-stats {
+  display: flex;
+  gap: 40px;
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 2px;
+}
+.title-stat span { color: var(--green); font-size: 13px; display: block; }
+
+/* ===== HOW TO PLAY SCREEN ===== */
+#howto-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a1e12 0%, #050a06 70%);
+  overflow-y: auto;
+  padding: 40px 20px;
+}
+.howto-container {
+  max-width: 900px;
+  width: 100%;
+}
+.howto-title {
+  font-family: var(--font-main);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+.howto-subtitle {
+  color: var(--dim);
+  letter-spacing: 3px;
+  font-size: 11px;
+  margin-bottom: 32px;
+}
+.howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.howto-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 20px;
+  position: relative;
+}
+.howto-card-title {
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.howto-card-title .icon { font-size: 18px; }
+.howto-card p { color: var(--white); line-height: 1.7; font-size: 11px; }
+.howto-card p + p { margin-top: 8px; }
+.howto-card .highlight { color: var(--green); }
+.howto-card .warn { color: var(--red); }
+.howto-card .tip { color: var(--amber); }
+.howto-threats { margin-bottom: 24px; }
+.threat-table { width: 100%; border-collapse: collapse; }
+.threat-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--amber);
+  font-size: 10px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--border);
+}
+.threat-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(26,53,37,0.5);
+  font-size: 11px;
+}
+.threat-table tr:hover td { background: var(--panel2); }
+.howto-back {
+  text-align: center;
+  margin-top: 24px;
+}
+
+/* ===== MISSION SELECT ===== */
+#mission-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a1e12 0%, #050a06 70%);
+}
+.mission-title {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--dim);
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+}
+.mission-header {
+  font-family: var(--font-main);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+}
+.mission-cards { display: flex; gap: 20px; }
+.mission-card {
+  width: 260px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+.mission-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,255,136,0.1); }
+.mission-card.locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.mission-card.completed { border-color: var(--green2); }
+.mission-num {
+  font-family: var(--font-main);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--green-dim);
+  position: absolute;
+  top: 12px;
+  right: 16px;
+}
+.mission-card-title {
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.mission-card-sub {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.mission-threats { margin-bottom: 16px; }
+.mission-threat-line { color: var(--white); font-size: 11px; margin-bottom: 4px; }
+.mission-budget {
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+.mission-difficulty { display: flex; gap: 4px; }
+.diff-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.diff-dot.active { background: var(--amber); }
+.lock-msg { font-size: 10px; color: var(--dim); margin-top: 12px; letter-spacing: 1px; }
+.mission-score-display { font-size: 11px; color: var(--green); margin-top: 8px; }
+
+/* ===== GAME SCREEN ===== */
+#game-screen {
+  flex-direction: column;
+  overflow: hidden;
+}
+/* TOP BAR */
+#top-bar {
+  height: 48px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 24px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.hud-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 2px; }
+.hud-value { font-family: var(--font-main); font-size: 16px; font-weight: 600; color: var(--green); }
+.hud-value.amber { color: var(--amber); }
+.hud-value.red { color: var(--red); }
+.hud-sep { width: 1px; height: 32px; background: var(--border); }
+.hud-block { display: flex; flex-direction: column; }
+#mission-name-hud { font-family: var(--font-main); font-size: 13px; font-weight: 600; color: var(--green); letter-spacing: 2px; margin-right: auto; }
+.phase-badge {
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border: 1px solid;
+  font-family: var(--font-main);
+}
+.phase-badge.deploy { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+.phase-badge.combat { border-color: var(--red); color: var(--red); background: var(--red-dim); animation: pulse 1s ease-in-out infinite; }
+.phase-badge.victory { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.phase-badge.defeat { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+/* MAIN GAME AREA */
+#game-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+/* LEFT PANEL */
+#left-panel {
+  width: 200px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-family: var(--font-main);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--dim);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel2);
+}
+.asset-card {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.asset-card:hover { background: var(--panel2); }
+.asset-card.selected { background: var(--green-dim); border-left: 2px solid var(--green); }
+.asset-card.depleted { opacity: 0.4; cursor: not-allowed; }
+.asset-card.engaging { border-left: 2px solid var(--amber); }
+.asset-name { font-family: var(--font-main); font-size: 12px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.asset-type-badge {
+  display: inline-block;
+  font-size: 8px;
+  padding: 1px 6px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  border-radius: 0;
+}
+.type-patriot { background: rgba(255,51,51,0.2); color: var(--red); border: 1px solid var(--red); }
+.type-f16 { background: rgba(0,170,255,0.2); color: var(--blue); border: 1px solid var(--blue); }
+.type-mig { background: rgba(255,179,0,0.2); color: var(--amber); border: 1px solid var(--amber); }
+.type-drone { background: rgba(0,255,136,0.2); color: var(--green); border: 1px solid var(--green); }
+.asset-ammo { font-size: 10px; color: var(--dim); }
+.asset-ammo span { color: var(--white); }
+.asset-cost { font-size: 10px; color: var(--amber); }
+.asset-placed-indicator { font-size: 9px; color: var(--green); letter-spacing: 1px; }
+.deploy-instructions {
+  padding: 12px;
+  font-size: 10px;
+  color: var(--dim);
+  line-height: 1.6;
+  border-bottom: 1px solid var(--border);
+}
+.deploy-instructions .step { color: var(--amber); }
+
+/* MAP AREA */
+#map-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #030c06;
+}
+#map-canvas { display: block; }
+
+/* RIGHT PANEL */
+#right-panel {
+  width: 220px;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+#threat-queue {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.threat-card {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.threat-card.high { border-left: 3px solid var(--red); }
+.threat-card.medium { border-left: 3px solid var(--amber); }
+.threat-card.low { border-left: 3px solid var(--green); }
+.threat-card.destroyed { opacity: 0.3; }
+.threat-card.decoy-confirmed { border-left: 3px solid var(--dim); }
+.threat-id { font-size: 9px; color: var(--dim); letter-spacing: 1px; margin-bottom: 2px; }
+.threat-name { font-family: var(--font-main); font-size: 11px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.threat-target { font-size: 10px; color: var(--amber); margin-bottom: 3px; }
+.threat-eta { font-family: var(--font-main); font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 6px; }
+.threat-eta.safe { color: var(--amber); }
+.threat-eta.far { color: var(--green); }
+.threat-status { font-size: 9px; letter-spacing: 1px; margin-bottom: 6px; }
+.status-detected { color: var(--amber); }
+.status-engaged { color: var(--blue); }
+.status-hit { color: var(--green); }
+.status-miss { color: var(--red); }
+.status-impact { color: var(--red); font-weight: bold; }
+.status-decoy { color: var(--dim); }
+.status-uninterceptable { color: var(--red); }
+.engage-btn {
+  width: 100%;
+  padding: 6px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.engage-btn:hover { background: var(--red); color: var(--bg); }
+.engage-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.recommend-badge { font-size: 9px; color: var(--dim); margin-bottom: 4px; }
+.recommend-badge span { color: var(--green); }
+
+/* BOTTOM LOG */
+#bottom-log {
+  height: 80px;
+  background: var(--panel2);
+  border-top: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 6px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  flex-shrink: 0;
+}
+.log-entry {
+  font-size: 10px;
+  padding: 2px 0;
+  line-height: 1.4;
+}
+.log-time { color: var(--dim); margin-right: 6px; }
+.log-hit { color: var(--green); }
+.log-miss { color: var(--amber); }
+.log-impact { color: var(--red); }
+.log-detect { color: var(--blue); }
+.log-info { color: var(--white); }
+
+/* DEPLOY BUTTON */
+#deploy-confirm-btn {
+  margin: 12px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: none;
+}
+#deploy-confirm-btn:hover { background: var(--green); color: var(--bg); }
+#deploy-confirm-btn.visible { display: block; }
+
+/* COVERAGE METER */
+#coverage-meter {
+  margin: 8px 12px;
+  display: none;
+}
+#coverage-meter.visible { display: block; }
+.coverage-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 4px; }
+.coverage-bar { height: 6px; background: var(--border); position: relative; }
+.coverage-fill { height: 100%; background: var(--green); transition: width 0.3s; }
+
+/* RESULT SCREEN */
+#result-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0a1e12 0%, #050a06 70%);
+}
+.result-rank {
+  font-family: var(--font-main);
+  font-size: 120px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.result-rank.s { color: var(--green); text-shadow: 0 0 60px rgba(0,255,136,0.5); }
+.result-rank.a { color: var(--amber); text-shadow: 0 0 60px rgba(255,179,0,0.5); }
+.result-rank.b { color: var(--blue); }
+.result-rank.f { color: var(--red); }
+.result-mission { font-size: 11px; color: var(--dim); letter-spacing: 4px; margin-bottom: 32px; }
+.result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; width: 480px; }
+.result-stat {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+.result-stat-label { font-size: 9px; color: var(--dim); letter-spacing: 2px; margin-bottom: 6px; }
+.result-stat-value { font-family: var(--font-main); font-size: 24px; font-weight: 600; color: var(--white); }
+.result-stat-value.good { color: var(--green); }
+.result-stat-value.bad { color: var(--red); }
+.result-buttons { display: flex; gap: 16px; }
+
+/* TOOLTIP */
+#tooltip {
+  position: fixed;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--white);
+  pointer-events: none;
+  z-index: 1000;
+  display: none;
+  max-width: 180px;
+  line-height: 1.5;
+}
+
+/* SELECTED ASSET INDICATOR on map */
+.map-instruction {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(5,10,6,0.9);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 6px 16px;
+  pointer-events: none;
+  z-index: 5;
+  display: none;
+}
+.map-instruction.visible { display: block; }
+
+/* WAVE INCOMING OVERLAY */
+#wave-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5,10,6,0.7);
+  z-index: 20;
+  display: none;
+}
+#wave-overlay.visible { display: flex; }
+.wave-text {
+  font-family: var(--font-main);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--red);
+  letter-spacing: 8px;
+  text-shadow: 0 0 40px rgba(255,51,51,0.8);
+  animation: waveFlash 0.5s ease-in-out infinite;
+}
+@keyframes waveFlash { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* RADAR TUTORIAL HIGHLIGHT */
+.tutorial-arrow {
+  position: absolute;
+  color: var(--amber);
+  font-size: 11px;
+  letter-spacing: 1px;
+  pointer-events: none;
+  animation: pulse 1s ease-in-out infinite;
+  z-index: 10;
+}
+
+.btn-small {
+  font-family: var(--font-main);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--dim);
+  color: var(--dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-small:hover { border-color: var(--white); color: var(--white); }
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen" class="screen active">
+  <div class="title-grid"></div>
+  <div class="title-scanline"></div>
+  <div class="title-content">
+    <div class="title-badge">⚡ CLASSIFIED SIMULATION // UKRAINE AIR DEFENSE ⚡</div>
+    <div class="title-main">BLACKOUT<br>SHIELD</div>
+    <div class="title-sub">OPERATION ANTI-DRONE DEFENSE</div>
+    <div class="title-buttons">
+      <button class="btn-primary" onclick="showScreen('mission-screen')">▶ START MISSION</button>
+      <button class="btn-secondary" onclick="showScreen('howto-screen')">? HOW TO PLAY</button>
+    </div>
+    <div class="title-stats">
+      <div>AREA DEFENDED<span>600×600 KM</span></div>
+      <div>CRITICAL TARGETS<span>5 OBJECTIVES</span></div>
+      <div>THREAT TYPES<span>6 CATEGORIES</span></div>
+      <div>MISSIONS<span>3 CAMPAIGNS</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO PLAY SCREEN -->
+<div id="howto-screen" class="screen">
+  <div class="howto-container">
+    <div class="howto-title">HOW TO PLAY</div>
+    <div class="howto-subtitle">READ THIS BEFORE YOUR FIRST MISSION — EVEN A 10-YEAR-OLD CAN GET IT</div>
+
+    <div class="howto-grid">
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">🎯</span> YOUR GOAL</div>
+        <p>Enemy missiles and drones are flying toward Ukraine's <span class="highlight">5 power plants</span>. If they hit, the lights go out for millions of people.</p>
+        <p>Your job: <span class="highlight">shoot them down</span> before they arrive. But be smart — bullets cost money!</p>
+        <p class="tip">★ SCORE MORE by killing expensive threats with cheap weapons, and killing them EARLY.</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">🗺️</span> THE MAP</div>
+        <p>You see a <span class="highlight">600×600 km map</span> of Ukraine. The 5 targets are marked with ⚡ icons.</p>
+        <p>Enemies come from 3 directions: <span class="highlight">North</span> (Belarus), <span class="highlight">East</span> (Russia), <span class="highlight">South</span> (Crimea).</p>
+        <p>You can't see enemies until your <span class="tip">radar detects</span> them!</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">📡</span> RADARS — YOUR EYES</div>
+        <p>Place radars on the map before the attack. Each radar sees everything within <span class="highlight">100 km</span> of it (shown as a circle).</p>
+        <p><span class="warn">If there's no radar nearby, you're BLIND!</span> You can't shoot what you can't see.</p>
+        <p class="tip">TIP: Cover the paths between enemy spawn zones and your targets.</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">🛡️</span> YOUR WEAPONS</div>
+        <p><span class="highlight">Patriot Battery</span> — Best weapon. Shoots down fast missiles. Very expensive ($4M per shot). Save it for Kinzhals!</p>
+        <p><span class="highlight">F-16 / MiG-29</span> — Fighter jets. Good against cruise missiles. Moderate cost.</p>
+        <p><span class="highlight">Interceptor Drones</span> — Tiny, cheap ($2K each). Only good against slow Shaheds, but you have 500 of them!</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">✈️</span> ENEMY THREATS</div>
+        <p><span class="warn">Kinzhal (★★★)</span> — Russia's fastest missile. Mach 10! Only Patriot can stop it. Worth 1000 points if you kill it.</p>
+        <p><span class="warn">Iskander (★★)</span> — Ballistic missile. Mach 7. Use Patriot or jets.</p>
+        <p><span class="highlight">Shahed (★)</span> — Slow kamikaze drone. Cheap to shoot down with interceptor drones. Don't waste a Patriot on it!</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">💡</span> THE GOLDEN RULE</div>
+        <p>Match the <span class="highlight">right weapon</span> to the right threat.</p>
+        <p><span class="warn">WRONG:</span> Shooting a $30K Shahed with a $4M Patriot = you LOSE points massively.</p>
+        <p><span class="highlight">RIGHT:</span> Shooting a Shahed with a $2K drone = cheap, efficient, more points!</p>
+        <p class="tip">The score rewards you for being FAST, SMART, and CHEAP.</p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">🎲</span> DECOYS (Mission 2+)</div>
+        <p>The enemy mixes in <span class="highlight">fake drones</span> that look just like Shaheds. They don't blow anything up — they just waste your ammo!</p>
+        <p>Wait <span class="tip">3 seconds</span> after detection for radar to confirm if it's real or fake.</p>
+        <p><span class="warn">Fire too early? You might waste a drone on a fake target.</span></p>
+      </div>
+
+      <div class="howto-card">
+        <div class="howto-card-title"><span class="icon">📊</span> HOW TO WIN</div>
+        <p>Each mission has a <span class="highlight">budget limit</span> and a <span class="highlight">target survival goal</span>.</p>
+        <p>Kill threats fast → <span class="tip">Speed Bonus ×1.5</span></p>
+        <p>Finish in under 15 minutes → <span class="tip">+20% total bonus</span></p>
+        <p>Go over budget or let a target get hit → <span class="warn">rank drops!</span></p>
+      </div>
+    </div>
+
+    <div class="howto-threats">
+      <table class="threat-table">
+        <thead>
+          <tr>
+            <th>ENEMY</th>
+            <th>SPEED</th>
+            <th>BEST WEAPON TO USE</th>
+            <th>POINTS IF KILLED</th>
+            <th>DANGER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>☄️ Kinzhal</td>
+            <td>Mach 10</td>
+            <td><span style="color:var(--red)">Patriot PAC-3 only</span></td>
+            <td>1000 pts</td>
+            <td><span style="color:var(--red)">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td>🚀 Iskander-M</td>
+            <td>Mach 7</td>
+            <td>Patriot PAC-2</td>
+            <td>500 pts</td>
+            <td><span style="color:var(--red)">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>🚀 Iskander-K</td>
+            <td>Mach 2.5</td>
+            <td>MiG-29 / F-16</td>
+            <td>300 pts</td>
+            <td><span style="color:var(--amber)">★★★</span></td>
+          </tr>
+          <tr>
+            <td>✈️ Cruise Missile</td>
+            <td>Mach 0.8</td>
+            <td>F-16 / MiG-29</td>
+            <td>150 pts</td>
+            <td><span style="color:var(--amber)">★★</span></td>
+          </tr>
+          <tr>
+            <td>🔴 Shahed Drone</td>
+            <td>250 km/h</td>
+            <td><span style="color:var(--green)">Interceptor Drones</span></td>
+            <td>50 pts</td>
+            <td><span style="color:var(--green)">★</span></td>
+          </tr>
+          <tr>
+            <td>👻 Decoy Drone</td>
+            <td>250 km/h</td>
+            <td>Wait 3 sec, confirm, use drone</td>
+            <td>5 pts</td>
+            <td><span style="color:var(--dim)">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="howto-back">
+      <button class="btn-primary" onclick="showScreen('mission-screen')" style="margin-right:12px">▶ SELECT MISSION</button>
+      <button class="btn-secondary" onclick="showScreen('title-screen')">← BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MISSION SELECT -->
+<div id="mission-screen" class="screen">
+  <div class="mission-title">CAMPAIGN SELECT</div>
+  <div class="mission-header">CHOOSE YOUR MISSION</div>
+  <div class="mission-cards">
+
+    <div class="mission-card" onclick="startMission(1)" id="mcard-1">
+      <div class="mission-num">01</div>
+      <div class="mission-card-title">CALIBRATION</div>
+      <div class="mission-card-sub">TUTORIAL // NORTH AXIS ONLY</div>
+      <div class="mission-threats">
+        <div class="mission-threat-line">☄️ 1× Kinzhal (Mach 10)</div>
+        <div class="mission-threat-line">🚀 3× Iskander-M</div>
+        <div class="mission-threat-line">🔴 5× Shahed drone</div>
+      </div>
+      <div class="mission-budget">💰 Budget limit: $20M</div>
+      <div class="mission-difficulty">
+        <div class="diff-dot active"></div>
+        <div class="diff-dot"></div>
+        <div class="diff-dot"></div>
+      </div>
+      <div class="mission-score-display" id="m1-score"></div>
+    </div>
+
+    <div class="mission-card locked" onclick="startMission(2)" id="mcard-2">
+      <div class="mission-num">02</div>
+      <div class="mission-card-title">EAST PRESSURE</div>
+      <div class="mission-card-sub">SATURATION // DECOYS ACTIVE</div>
+      <div class="mission-threats">
+        <div class="mission-threat-line">✈️ 20× Cruise missiles</div>
+        <div class="mission-threat-line">🚀 15× Iskander-K</div>
+        <div class="mission-threat-line">🔴 40× Shahed + 20× Decoys</div>
+      </div>
+      <div class="mission-budget">💰 Budget limit: $55M</div>
+      <div class="mission-difficulty">
+        <div class="diff-dot active"></div>
+        <div class="diff-dot active"></div>
+        <div class="diff-dot"></div>
+      </div>
+      <div class="lock-msg" id="m2-lock">🔒 Complete Mission 1 to unlock</div>
+      <div class="mission-score-display" id="m2-score"></div>
+    </div>
+
+    <div class="mission-card locked" onclick="startMission(3)" id="mcard-3">
+      <div class="mission-num">03</div>
+      <div class="mission-card-title">BLACKOUT PROTOCOL</div>
+      <div class="mission-card-sub">FULL ASSAULT // ALL AXES</div>
+      <div class="mission-threats">
+        <div class="mission-threat-line">☄️ 12× Kinzhal + 15× Iskander-M</div>
+        <div class="mission-threat-line">✈️ 50× Cruise + 30× Iskander-K</div>
+        <div class="mission-threat-line">🔴 200× Shahed + 105× Decoys</div>
+      </div>
+      <div class="mission-budget">💰 Budget limit: $150M</div>
+      <div class="mission-difficulty">
+        <div class="diff-dot active"></div>
+        <div class="diff-dot active"></div>
+        <div class="diff-dot active"></div>
+      </div>
+      <div class="lock-msg" id="m3-lock">🔒 Complete Mission 2 to unlock</div>
+      <div class="mission-score-display" id="m3-score"></div>
+    </div>
+  </div>
+  <br>
+  <button class="btn-secondary" onclick="showScreen('title-screen')" style="margin-top:24px">← BACK</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <!-- TOP BAR -->
+  <div id="top-bar">
+    <div id="mission-name-hud">MISSION 1: CALIBRATION</div>
+    <div class="phase-badge deploy" id="phase-badge">DEPLOY PHASE</div>
+    <div class="hud-sep"></div>
+    <div class="hud-block">
+      <div class="hud-label">CLOCK</div>
+      <div class="hud-value" id="hud-clock">00:00</div>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-block">
+      <div class="hud-label">BUDGET SPENT</div>
+      <div class="hud-value amber" id="hud-budget">$0</div>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-block">
+      <div class="hud-label">BUDGET LIMIT</div>
+      <div class="hud-value" id="hud-limit">$20M</div>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-block">
+      <div class="hud-label">SCORE</div>
+      <div class="hud-value" id="hud-score">0</div>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-block">
+      <div class="hud-label">TARGETS SAFE</div>
+      <div class="hud-value" id="hud-targets">5/5</div>
+    </div>
+    <div class="hud-sep"></div>
+    <button class="btn-small" onclick="showScreen('mission-screen')" style="margin-left:auto">✕ ABORT</button>
+  </div>
+
+  <div id="game-main">
+    <!-- LEFT PANEL -->
+    <div id="left-panel">
+      <div class="panel-title">DEFENSE ASSETS</div>
+      <div class="deploy-instructions" id="deploy-instructions">
+        <div class="step">STEP 1:</div> Click an asset below to select it<br><br>
+        <div class="step">STEP 2:</div> Click on the map to place it<br><br>
+        <div class="step">STEP 3:</div> Place all radars + assets, then press LAUNCH
+      </div>
+      <div id="asset-list"></div>
+      <div id="coverage-meter" class="coverage-meter">
+        <div class="coverage-label">RADAR COVERAGE</div>
+        <div class="coverage-bar"><div class="coverage-fill" id="coverage-fill" style="width:0%"></div></div>
+      </div>
+      <button id="deploy-confirm-btn" onclick="startCombat()">⚡ LAUNCH DEFENSE</button>
+    </div>
+
+    <!-- MAP -->
+    <div id="map-container">
+      <canvas id="map-canvas"></canvas>
+      <div class="map-instruction" id="map-instruction"></div>
+      <div id="wave-overlay" style="display:none">
+        <div class="wave-text" id="wave-text">WAVE INCOMING</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div id="right-panel">
+      <div class="panel-title">⚠ THREAT QUEUE — ETA ORDER</div>
+      <div id="threat-queue">
+        <div style="padding:16px;color:var(--dim);font-size:10px;text-align:center">
+          No threats detected.<br>Deploy assets and<br>launch defense.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM LOG -->
+  <div id="bottom-log">
+    <div class="log-entry"><span class="log-time">[00:00]</span><span class="log-info">System initialized. Awaiting deployment...</span></div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen" class="screen">
+  <div class="result-rank" id="result-rank">S</div>
+  <div class="result-mission" id="result-mission">MISSION 1: CALIBRATION — COMPLETE</div>
+  <div class="result-stats" id="result-stats"></div>
+  <div class="result-buttons">
+    <button class="btn-primary" id="next-mission-btn" onclick="goNextMission()">▶ NEXT MISSION</button>
+    <button class="btn-secondary" onclick="showScreen('mission-screen')">↩ MISSION SELECT</button>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ==================== STATE ====================
+const STATE = {
+  currentMission: 1,
+  completedMissions: JSON.parse(localStorage.getItem('bsCompleted') || '[]'),
+  scores: JSON.parse(localStorage.getItem('bsScores') || '{}'),
+  phase: 'deploy', // deploy | combat | result
+  selectedAsset: null,
+  placedItems: [], // {type, x, y, id, ...}
+  bandits: [],
+  score: 0,
+  budget: 0,
+  clockSeconds: 0,
+  clockInterval: null,
+  animFrame: null,
+  targetsAlive: [true,true,true,true,true],
+  gameStartTime: null,
+  logEntries: [],
+};
+
+// ==================== MISSION DATA ====================
+const MISSIONS = {
+  1: {
+    name: "CALIBRATION",
+    subtitle: "TUTORIAL // NORTH AXIS ONLY",
+    budgetLimit: 20e6,
+    minTargetsSurvive: 2,
+    pauseAllowed: true,
+    radarCount: 3,
+    assets: [
+      { id:'patriot1', name:'Patriot Battery', type:'patriot', ammo:8, costPerShot:4e6, range:160, hitProb:{kinzhal:0.96,iskander:0.88,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-patriot', icon:'🛡️' },
+      { id:'f16-1', name:'F-16 Fighter', type:'f16', ammo:4, costPerShot:1e6, range:160, hitProb:{kinzhal:0.45,iskander:0.7,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-f16', icon:'✈️' },
+      { id:'drones1', name:'Interceptor Drones', type:'drone', ammo:100, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+    ],
+    spawnGroups: [
+      { axis:'north', delay:2000, bandits:[
+        { id:'K1', type:'kinzhal', name:'Kinzhal-01', targetIdx:4, mach:10, points:1000, color:'#ff3333' },
+        { id:'I1', type:'iskander', name:'Iskander-01', targetIdx:0, mach:7, points:500, color:'#ff6600' },
+        { id:'I2', type:'iskander', name:'Iskander-02', targetIdx:4, mach:7, points:500, color:'#ff6600' },
+        { id:'I3', type:'iskander', name:'Iskander-03', targetIdx:0, mach:7, points:500, color:'#ff6600' },
+      ]},
+      { axis:'north', delay:5000, bandits:[
+        { id:'S1', type:'shahed', name:'Shahed-01', targetIdx:0, mach:0.07, points:50, color:'#ffcc00' },
+        { id:'S2', type:'shahed', name:'Shahed-02', targetIdx:0, mach:0.07, points:50, color:'#ffcc00' },
+        { id:'S3', type:'shahed', name:'Shahed-03', targetIdx:4, mach:0.07, points:50, color:'#ffcc00' },
+        { id:'S4', type:'shahed', name:'Shahed-04', targetIdx:4, mach:0.07, points:50, color:'#ffcc00' },
+        { id:'S5', type:'shahed', name:'Shahed-05', targetIdx:0, mach:0.07, points:50, color:'#ffcc00' },
+      ]},
+    ],
+  },
+  2: {
+    name: "EAST PRESSURE",
+    subtitle: "SATURATION // DECOYS ACTIVE",
+    budgetLimit: 55e6,
+    minTargetsSurvive: 2,
+    pauseAllowed: false,
+    radarCount: 5,
+    assets: [
+      { id:'patriot1', name:'Patriot Battery', type:'patriot', ammo:12, costPerShot:4e6, range:160, hitProb:{kinzhal:0.96,iskander:0.88,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-patriot', icon:'🛡️' },
+      { id:'f16-1', name:'F-16 Alpha', type:'f16', ammo:4, costPerShot:1e6, range:160, hitProb:{kinzhal:0.45,iskander:0.7,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-f16', icon:'✈️' },
+      { id:'mig1', name:'MiG-29 Bravo', type:'mig', ammo:4, costPerShot:500000, range:110, hitProb:{kinzhal:0,iskander:0.55,cruise:0.75,shahed:0.4,decoy:1}, badge:'type-mig', icon:'🛩️' },
+      { id:'mig2', name:'MiG-29 Charlie', type:'mig', ammo:4, costPerShot:500000, range:110, hitProb:{kinzhal:0,iskander:0.55,cruise:0.75,shahed:0.4,decoy:1}, badge:'type-mig', icon:'🛩️' },
+      { id:'drones1', name:'Drone Hub Alpha', type:'drone', ammo:200, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+      { id:'drones2', name:'Drone Hub Beta', type:'drone', ammo:200, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+    ],
+    spawnGroups: [
+      { axis:'east', delay:2000, bandits: generateEastWave() },
+    ],
+  },
+  3: {
+    name: "BLACKOUT PROTOCOL",
+    subtitle: "FULL ASSAULT // ALL AXES",
+    budgetLimit: 150e6,
+    minTargetsSurvive: 4,
+    pauseAllowed: false,
+    radarCount: 9,
+    assets: [
+      { id:'patriot1', name:'Patriot Alpha', type:'patriot', ammo:20, costPerShot:4e6, range:160, hitProb:{kinzhal:0.96,iskander:0.88,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-patriot', icon:'🛡️' },
+      { id:'patriot2', name:'Patriot Bravo', type:'patriot', ammo:20, costPerShot:4e6, range:160, hitProb:{kinzhal:0.96,iskander:0.88,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-patriot', icon:'🛡️' },
+      { id:'f16-1', name:'F-16 Alpha', type:'f16', ammo:4, costPerShot:1e6, range:160, hitProb:{kinzhal:0.45,iskander:0.7,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-f16', icon:'✈️' },
+      { id:'f16-2', name:'F-16 Beta', type:'f16', ammo:4, costPerShot:1e6, range:160, hitProb:{kinzhal:0.45,iskander:0.7,cruise:0.85,shahed:0.5,decoy:1}, badge:'type-f16', icon:'✈️' },
+      { id:'mig1', name:'MiG-29 Charlie', type:'mig', ammo:4, costPerShot:500000, range:110, hitProb:{kinzhal:0,iskander:0.55,cruise:0.75,shahed:0.4,decoy:1}, badge:'type-mig', icon:'🛩️' },
+      { id:'mig2', name:'MiG-29 Delta', type:'mig', ammo:4, costPerShot:500000, range:110, hitProb:{kinzhal:0,iskander:0.55,cruise:0.75,shahed:0.4,decoy:1}, badge:'type-mig', icon:'🛩️' },
+      { id:'drones1', name:'Drone Hub A', type:'drone', ammo:150, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+      { id:'drones2', name:'Drone Hub B', type:'drone', ammo:150, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+      { id:'drones3', name:'Drone Hub C', type:'drone', ammo:150, costPerShot:2000, range:20, hitProb:{kinzhal:0,iskander:0,cruise:0.1,shahed:0.78,decoy:1}, badge:'type-drone', icon:'🚁' },
+    ],
+    spawnGroups: [
+      { axis:'north', delay:1000, bandits: generateNorthWave() },
+      { axis:'east', delay:3000, bandits: generateEastWave2() },
+      { axis:'south', delay:6000, bandits: generateSouthWave() },
+    ],
+  }
+};
+
+function generateEastWave() {
+  const b = [];
+  for(let i=0;i<20;i++) b.push({id:`CM${i}`,type:'cruise',name:`Cruise-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:0.8,points:150,color:'#ff9900'});
+  for(let i=0;i<15;i++) b.push({id:`IK${i}`,type:'iskander_k',name:`IskK-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:2.5,points:300,color:'#ff6600'});
+  for(let i=0;i<40;i++) b.push({id:`SH${i}`,type:'shahed',name:`Shahed-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:0.07,points:50,color:'#ffcc00'});
+  for(let i=0;i<20;i++) b.push({id:`DC${i}`,type:'decoy',name:`Decoy-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:0.07,points:5,color:'#666'});
+  return shuffle(b);
+}
+function generateNorthWave() {
+  const b = [];
+  for(let i=0;i<12;i++) b.push({id:`KN${i}`,type:'kinzhal',name:`Kinzhal-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?0:4,mach:10,points:1000,color:'#ff3333'});
+  for(let i=0;i<15;i++) b.push({id:`IM${i}`,type:'iskander',name:`Iskander-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?0:4,mach:7,points:500,color:'#ff6600'});
+  return b;
+}
+function generateEastWave2() {
+  const b = [];
+  for(let i=0;i<50;i++) b.push({id:`CM2${i}`,type:'cruise',name:`Cruise-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:0.8,points:150,color:'#ff9900'});
+  for(let i=0;i<30;i++) b.push({id:`IK2${i}`,type:'iskander_k',name:`IskK-${String(i+1).padStart(2,'0')}`,targetIdx:i%2===0?1:3,mach:2.5,points:300,color:'#ff6600'});
+  return b;
+}
+function generateSouthWave() {
+  const b = [];
+  for(let i=0;i<80;i++) b.push({id:`SS${i}`,type:'shahed',name:`Shahed-${String(i+1).padStart(2,'0')}`,targetIdx:i%3===0?0:i%3===1?2:0,mach:0.07,points:50,color:'#ffcc00'});
+  for(let i=0;i<40;i++) b.push({id:`SD${i}`,type:'decoy',name:`Decoy-${String(i+1).padStart(2,'0')}`,targetIdx:0,mach:0.07,points:5,color:'#666'});
+  return shuffle(b);
+}
+function shuffle(arr) { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+// ==================== TARGETS ====================
+const TARGETS = [
+  { name:'Kyiv Thermal Plant', shortName:'T1: Kyiv Plant', x:0.5, y:0.18, color:'#00ff88' },
+  { name:'Vokzalna Substation', shortName:'T2: Substation', x:0.48, y:0.22, color:'#00ff88' },
+  { name:'Trypillya Plant', shortName:'T3: Trypillya', x:0.44, y:0.35, color:'#00ff88' },
+  { name:'Boryspil Hub', shortName:'T4: Boryspil', x:0.57, y:0.25, color:'#00ff88' },
+  { name:'Hostomel Aerodrome', shortName:'T5: Hostomel', x:0.43, y:0.17, color:'#00ff88' },
+];
+
+// Axis spawn positions (relative to canvas)
+const AXES = {
+  north: { x:0.5, y:-0.05, label:'N — BELARUS', color:'#ff3333' },
+  east:  { x:1.05, y:0.5,  label:'E — RUSSIA',  color:'#ff6600' },
+  south: { x:0.5, y:1.05,  label:'S — CRIMEA',  color:'#ff9900' },
+};
+
+// ==================== CANVAS SETUP ====================
+let canvas, ctx, cw, ch;
+function initCanvas() {
+  canvas = document.getElementById('map-canvas');
+  const container = document.getElementById('map-container');
+  cw = container.clientWidth;
+  ch = container.clientHeight;
+  canvas.width = cw;
+  canvas.height = ch;
+  ctx = canvas.getContext('2d');
+}
+
+// ==================== SCREEN MANAGEMENT ====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id === 'mission-screen') updateMissionScreen();
+  if(id === 'game-screen') { initCanvas(); drawMap(); }
+}
+
+function updateMissionScreen() {
+  const c = STATE.completedMissions;
+  // unlock missions
+  if(c.includes(1)) {
+    document.getElementById('mcard-2').classList.remove('locked');
+    document.getElementById('m2-lock').style.display = 'none';
+  }
+  if(c.includes(2)) {
+    document.getElementById('mcard-3').classList.remove('locked');
+    document.getElementById('m3-lock').style.display = 'none';
+  }
+  // show scores
+  for(let i=1;i<=3;i++) {
+    const el = document.getElementById(`m${i}-score`);
+    if(STATE.scores[i]) el.textContent = `Best: ${STATE.scores[i].rank} — ${STATE.scores[i].score.toLocaleString()} pts`;
+  }
+}
+
+// ==================== GAME INIT ====================
+let missionData, placedAssets, placedRadars, activeBandits, allBandits;
+let gamePhase = 'deploy';
+let score = 0, budgetSpent = 0;
+let clockSecs = 0, clockInterval;
+let selectedTool = null; // {assetId} or 'radar'
+let radarPlaced = 0, assetsPlaced = {};
+let explosions = [], missileTrails = [];
+
+function startMission(num) {
+  STATE.currentMission = num;
+  missionData = MISSIONS[num];
+  gamePhase = 'deploy';
+  score = 0;
+  budgetSpent = 0;
+  clockSecs = 0;
+  selectedTool = null;
+  radarPlaced = 0;
+  assetsPlaced = {};
+  placedAssets = [];
+  placedRadars = [];
+  activeBandits = [];
+  allBandits = [];
+  explosions = [];
+  missileTrails = [];
+  STATE.targetsAlive = [true,true,true,true,true];
+
+  // Reset asset ammo
+  missionData.assets.forEach(a => { assetsPlaced[a.id] = null; });
+
+  showScreen('game-screen');
+
+  document.getElementById('mission-name-hud').textContent = `MISSION ${num}: ${missionData.name}`;
+  document.getElementById('hud-limit').textContent = '$' + (missionData.budgetLimit/1e6) + 'M';
+  document.getElementById('hud-targets').textContent = '5/5';
+  document.getElementById('hud-score').textContent = '0';
+  document.getElementById('hud-budget').textContent = '$0';
+  document.getElementById('hud-clock').textContent = '00:00';
+
+  setPhaseBadge('deploy');
+  buildAssetList();
+  clearLog();
+  addLog('info', 'System initialized. Place radars and assets, then press LAUNCH.');
+  addLog('info', `Mission ${num}: ${missionData.name} — Budget: $${(missionData.budgetLimit/1e6)}M`);
+
+  setTimeout(() => {
+    initCanvas();
+    drawMap();
+    canvas.addEventListener('click', handleMapClick);
+    canvas.addEventListener('mousemove', handleMapHover);
+  }, 100);
+}
+
+function buildAssetList() {
+  const list = document.getElementById('asset-list');
+  list.innerHTML = '';
+
+  // Radar entry
+  const radarCard = document.createElement('div');
+  radarCard.className = 'asset-card';
+  radarCard.id = 'asset-radar';
+  radarCard.innerHTML = `
+    <div class="asset-name">📡 Radar Unit</div>
+    <span class="asset-type-badge type-drone">SENSOR</span>
+    <div class="asset-ammo">Available: <span id="radar-count">${missionData.radarCount - radarPlaced}</span> / ${missionData.radarCount}</div>
+    <div class="asset-cost">Range: 100 km detection</div>
+  `;
+  radarCard.onclick = () => selectTool('radar');
+  list.appendChild(radarCard);
+
+  missionData.assets.forEach(asset => {
+    const card = document.createElement('div');
+    card.className = 'asset-card';
+    card.id = 'asset-card-' + asset.id;
+    card.innerHTML = `
+      <div class="asset-name">${asset.icon} ${asset.name}</div>
+      <span class="asset-type-badge ${asset.badge}">${asset.type.toUpperCase()}</span>
+      <div class="asset-ammo">Ammo: <span id="ammo-${asset.id}">${asset.ammo}</span> shots</div>
+      <div class="asset-cost">Cost/shot: $${(asset.costPerShot/1000).toFixed(0)}K</div>
+      <div class="asset-placed-indicator" id="placed-${asset.id}"></div>
+    `;
+    card.onclick = () => selectTool(asset.id);
+    list.appendChild(card);
+  });
+
+  document.getElementById('coverage-meter').classList.add('visible');
+  document.getElementById('deploy-confirm-btn').classList.add('visible');
+}
+
+function selectTool(id) {
+  selectedTool = id;
+  document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
+  const el = id === 'radar' ? document.getElementById('asset-radar') : document.getElementById('asset-card-' + id);
+  if(el) el.classList.add('selected');
+
+  const instr = document.getElementById('map-instruction');
+  instr.classList.add('visible');
+  if(id === 'radar') {
+    instr.textContent = '📡 CLICK MAP TO PLACE RADAR (100km detection radius)';
+  } else {
+    const a = missionData.assets.find(x => x.id === id);
+    instr.textContent = `${a.icon} CLICK MAP TO PLACE ${a.name.toUpperCase()} (${a.range}km range)`;
+  }
+}
+
+// ==================== MAP CLICK ====================
+function handleMapClick(e) {
+  if(gamePhase !== 'deploy') return;
+  if(!selectedTool) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / cw;
+  const my = (e.clientY - rect.top) / ch;
+
+  if(selectedTool === 'radar') {
+    if(radarPlaced >= missionData.radarCount) {
+      addLog('info', 'All radars already placed!');
+      return;
+    }
+    placedRadars.push({ x: mx, y: my, id: 'radar-' + radarPlaced });
+    radarPlaced++;
+    document.getElementById('radar-count').textContent = (missionData.radarCount - radarPlaced);
+    addLog('detect', `Radar placed at position [${(mx*600).toFixed(0)}km, ${(my*600).toFixed(0)}km]`);
+  } else {
+    const asset = missionData.assets.find(a => a.id === selectedTool);
+    if(!asset) return;
+    // Already placed?
+    const existing = placedAssets.findIndex(p => p.assetId === selectedTool);
+    if(existing >= 0) {
+      placedAssets.splice(existing, 1); // move it
+    }
+    placedAssets.push({ assetId: selectedTool, x: mx, y: my, asset: {...asset} });
+    document.getElementById('placed-' + selectedTool).textContent = `✓ PLACED AT [${(mx*600).toFixed(0)}, ${(my*600).toFixed(0)}]km`;
+    addLog('info', `${asset.name} placed at [${(mx*600).toFixed(0)}km, ${(my*600).toFixed(0)}km]`);
+  }
+
+  updateCoverage();
+  drawMap();
+  selectedTool = null;
+  document.querySelectorAll('.asset-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('map-instruction').classList.remove('visible');
+}
+
+let hoverPos = null;
+function handleMapHover(e) {
+  const rect = canvas.getBoundingClientRect();
+  hoverPos = { x: (e.clientX - rect.left)/cw, y: (e.clientY - rect.top)/ch };
+  if(gamePhase === 'deploy') drawMap();
+}
+
+function updateCoverage() {
+  const samples = 400;
+  let covered = 0;
+  for(let i=0;i<samples;i++) {
+    const sx = Math.random(), sy = Math.random();
+    for(const r of placedRadars) {
+      const dist = Math.hypot((sx-r.x)*600,(sy-r.y)*600);
+      if(dist <= 100) { covered++; break; }
+    }
+  }
+  const pct = Math.round((covered/samples)*100);
+  document.getElementById('coverage-fill').style.width = pct + '%';
+}
+
+// ==================== COMBAT START ====================
+function startCombat() {
+  if(radarPlaced === 0) { addLog('impact','⚠ Place at least 1 radar before launching!'); return; }
+
+  gamePhase = 'combat';
+  setPhaseBadge('combat');
+  document.getElementById('deploy-instructions').style.display = 'none';
+  document.getElementById('deploy-confirm-btn').classList.remove('visible');
+  document.getElementById('coverage-meter').classList.remove('visible');
+  document.getElementById('map-instruction').classList.remove('visible');
+  canvas.removeEventListener('click', handleMapClick);
+
+  addLog('detect', '⚡ DEFENSE LAUNCHED — Monitoring all sectors...');
+
+  // Spawn bandits per mission spawn groups
+  missionData.spawnGroups.forEach(group => {
+    setTimeout(() => spawnGroup(group), group.delay);
+  });
+
+  // Start clock
+  const startTime = Date.now();
+  clockInterval = setInterval(() => {
+    clockSecs++;
+    const m = String(Math.floor(clockSecs/60)).padStart(2,'0');
+    const s = String(clockSecs%60).padStart(2,'0');
+    document.getElementById('hud-clock').textContent = `${m}:${s}`;
+    updateBandits();
+    checkWinCondition();
+  }, 1000);
+
+  // Game loop for canvas
+  function loop() {
+    drawMap();
+    if(gamePhase === 'combat') requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+// ==================== BANDIT SPAWNING ====================
+function spawnGroup(group) {
+  if(gamePhase !== 'combat') return;
+  const axis = AXES[group.axis];
+  const baseDelay = 0;
+
+  group.bandits.forEach((bDef, idx) => {
+    const delay = baseDelay + idx * (group.axis === 'south' ? 800 : 400);
+    setTimeout(() => {
+      if(gamePhase !== 'combat') return;
+      const target = TARGETS[bDef.targetIdx];
+      // Spread spawn slightly
+      const spawnX = axis.x + (Math.random()-0.5)*0.08;
+      const spawnY = axis.y + (Math.random()-0.5)*0.08;
+
+      // Speed: mach * 1225 km/h, map = 600km, speed in map-units/sec
+      // We'll normalize: mach 1 = ~0.0057 map units/sec at 60fps
+      const speedKmhPerMapUnit = 600;
+      const speedKmh = bDef.mach * 1225;
+      const speedMapPerSec = speedKmh / speedKmhPerMapUnit;
+
+      const dx = target.x - spawnX;
+      const dy = target.y - spawnY;
+      const dist = Math.hypot(dx, dy);
+      const nx = dx/dist, ny = dy/dist;
+
+      const bandit = {
+        ...bDef,
+        x: spawnX,
+        y: spawnY,
+        targetX: target.x,
+        targetY: target.y,
+        targetIdx: bDef.targetIdx,
+        nx, ny,
+        speedMapPerSec,
+        status: 'flying', // flying | detected | engaged | destroyed | decoy_pending | impact
+        detected: false,
+        decoyTimer: null,
+        isDecoy: bDef.type === 'decoy',
+        displayAsDecoy: false,
+        engagedBy: null,
+        spawnTime: clockSecs,
+        distanceRemaining: dist,
+        trail: [],
+      };
+
+      activeBandits.push(bandit);
+    }, delay);
+  });
+
+  showWaveOverlay(group.axis.toUpperCase() + ' AXIS — WAVE INCOMING');
+}
+
+function showWaveOverlay(text) {
+  const ov = document.getElementById('wave-overlay');
+  const wt = document.getElementById('wave-text');
+  wt.textContent = text;
+  ov.style.display = 'flex';
+  setTimeout(() => { ov.style.display = 'none'; }, 2000);
+}
+
+// ==================== UPDATE BANDITS ====================
+function updateBandits() {
+  const toRemove = [];
+
+  activeBandits.forEach(b => {
+    if(b.status === 'destroyed' || b.status === 'impact') return;
+
+    // Move
+    b.x += b.nx * b.speedMapPerSec;
+    b.y += b.ny * b.speedMapPerSec;
+    b.trail.push({x:b.x, y:b.y});
+    if(b.trail.length > 20) b.trail.shift();
+    b.distanceRemaining = Math.hypot(b.targetX - b.x, b.targetY - b.y);
+
+    // Radar detection check
+    if(!b.detected) {
+      for(const r of placedRadars) {
+        const distKm = Math.hypot((b.x - r.x)*600, (b.y - r.y)*600);
+        if(distKm <= 100) {
+          b.detected = true;
+          onBanditDetected(b);
+          break;
+        }
+      }
+    }
+
+    // Check if reached target
+    if(b.distanceRemaining < 0.015 && b.status !== 'destroyed') {
+      b.status = 'impact';
+      onBanditImpact(b);
+    }
+  });
+
+  updateThreatQueue();
+}
+
+function onBanditDetected(b) {
+  if(b.type === 'decoy') {
+    b.status = 'decoy_pending';
+    addLog('detect', `⚠ ${b.name} detected — CLASSIFICATION IN PROGRESS...`);
+    setTimeout(() => {
+      if(b.status !== 'destroyed') {
+        b.status = 'detected';
+        b.displayAsDecoy = true;
+        addLog('info', `👻 ${b.name} confirmed as DECOY — low priority`);
+        updateThreatQueue();
+      }
+    }, 3000);
+  } else {
+    b.status = 'detected';
+    const priority = b.type === 'kinzhal' ? 'high' : b.type === 'iskander' ? 'high' : b.type === 'iskander_k' ? 'medium' : 'low';
+    addLog('detect', `📡 DETECTED: ${b.name} — ${typeLabel(b.type)} — targeting ${TARGETS[b.targetIdx].shortName}`);
+  }
+  updateThreatQueue();
+}
+
+function typeLabel(t) {
+  const labels = {kinzhal:'☄️ KINZHAL (Mach 10!)',iskander:'🚀 ISKANDER-M',iskander_k:'🚀 ISKANDER-K',cruise:'✈️ CRUISE MISSILE',shahed:'🔴 SHAHED DRONE',decoy:'👻 DECOY'};
+  return labels[t] || t;
+}
+
+function onBanditImpact(b) {
+  if(b.isDecoy) { b.status = 'destroyed'; return; }
+  addLog('impact', `💥 IMPACT! ${b.name} HIT ${TARGETS[b.targetIdx].shortName}!`);
+  STATE.targetsAlive[b.targetIdx] = false;
+  explosions.push({ x: b.targetX, y: b.targetY, r: 0, maxR: 0.04, alpha: 1, type: 'big' });
+  const alive = STATE.targetsAlive.filter(Boolean).length;
+  document.getElementById('hud-targets').textContent = `${alive}/5`;
+  updateThreatQueue();
+}
+
+// ==================== ENGAGE BANDIT ====================
+function engageBandit(banditId, assetId) {
+  const bandit = activeBandits.find(b => b.id === banditId);
+  const placedAsset = placedAssets.find(p => p.assetId === assetId);
+
+  if(!bandit || !placedAsset) return;
+  if(bandit.status === 'destroyed' || bandit.status === 'impact') return;
+  if(placedAsset.asset.ammo <= 0) { addLog('info', `⚠ ${placedAsset.asset.name} is OUT OF AMMO!`); return; }
+
+  // Range check
+  const distKm = Math.hypot((bandit.x - placedAsset.x)*600, (bandit.y - placedAsset.y)*600);
+  if(distKm > placedAsset.asset.range) {
+    addLog('miss', `⚠ ${placedAsset.asset.name} out of range (${distKm.toFixed(0)}km vs ${placedAsset.asset.range}km)`);
+    return;
+  }
+
+  // Deduct ammo and cost
+  placedAsset.asset.ammo--;
+  const weaponCost = placedAsset.asset.costPerShot;
+  budgetSpent += weaponCost;
+  document.getElementById('hud-budget').textContent = '$' + formatMoney(budgetSpent);
+  if(budgetSpent > missionData.budgetLimit) {
+    document.getElementById('hud-budget').classList.add('red');
+  }
+  // Update ammo display
+  const ammoEl = document.getElementById('ammo-' + assetId);
+  if(ammoEl) ammoEl.textContent = placedAsset.asset.ammo;
+
+  // Missile trail
+  missileTrails.push({ x1: placedAsset.x, y1: placedAsset.y, x2: bandit.x, y2: bandit.y, alpha: 1, color: '#00aaff' });
+
+  // Hit/miss
+  const hitProbs = placedAsset.asset.hitProb;
+  const prob = hitProbs[bandit.isDecoy ? 'decoy' : bandit.type] || 0;
+
+  // Warn if wrong weapon
+  const correct = isCorrectWeapon(bandit.type, placedAsset.asset.type);
+  if(!correct) addLog('miss', `⚠ INEFFICIENT: ${placedAsset.asset.name} is not ideal for ${typeLabel(bandit.type)}`);
+
+  bandit.status = 'engaged';
+  bandit.engagedBy = assetId;
+
+  setTimeout(() => {
+    if(bandit.status === 'destroyed' || bandit.status === 'impact') return;
+
+    const roll = Math.random();
+    if(roll < prob) {
+      // HIT
+      bandit.status = 'destroyed';
+      // Speed bonus
+      const flightFrac = bandit.distanceRemaining / Math.hypot(bandit.targetX - bandit.trail[0]?.x || bandit.x, bandit.targetY - bandit.trail[0]?.y || bandit.y);
+      const speedMult = bandit.distanceRemaining > 0.5 ? 1.5 : bandit.distanceRemaining > 0.3 ? 1.0 : 0.7;
+      // Cost penalty
+      const costPenalty = Math.floor(weaponCost / 1000);
+      const refund = correct ? costPenalty * 0.5 : 0;
+      const pts = Math.round(bandit.points * speedMult) - costPenalty + Math.round(refund);
+      score += pts;
+      document.getElementById('hud-score').textContent = score.toLocaleString();
+      explosions.push({ x: bandit.x, y: bandit.y, r: 0, maxR: 0.025, alpha: 1, type: 'hit' });
+      addLog('hit', `✅ HIT! ${placedAsset.asset.name} destroyed ${bandit.name} (+${pts} pts, -$${formatMoney(weaponCost)})`);
+    } else {
+      // MISS
+      bandit.status = 'detected';
+      bandit.engagedBy = null;
+      addLog('miss', `❌ MISS! ${placedAsset.asset.name} failed to intercept ${bandit.name} — try again!`);
+    }
+    updateThreatQueue();
+    updateAssetCards();
+  }, 800);
+
+  updateThreatQueue();
+  updateAssetCards();
+}
+
+function isCorrectWeapon(threatType, assetType) {
+  const matrix = {
+    kinzhal: ['patriot'],
+    iskander: ['patriot','f16'],
+    iskander_k: ['f16','mig'],
+    cruise: ['f16','mig'],
+    shahed: ['drone'],
+    decoy: ['drone'],
+  };
+  return (matrix[threatType] || []).includes(assetType);
+}
+
+function getRecommendedAsset(bandit) {
+  const rec = { kinzhal:'Patriot', iskander:'Patriot / F-16', iskander_k:'F-16 / MiG-29', cruise:'F-16 / MiG-29', shahed:'Interceptor Drones', decoy:'Interceptor Drones' };
+  return rec[bandit.type] || '—';
+}
+
+function updateAssetCards() {
+  missionData.assets.forEach(asset => {
+    const placed = placedAssets.find(p => p.assetId === asset.id);
+    if(placed) {
+      const ammoEl = document.getElementById('ammo-' + asset.id);
+      if(ammoEl) ammoEl.textContent = placed.asset.ammo;
+      const card = document.getElementById('asset-card-' + asset.id);
+      if(card && placed.asset.ammo === 0) card.classList.add('depleted');
+    }
+  });
+}
+
+// ==================== THREAT QUEUE ====================
+function updateThreatQueue() {
+  const queue = document.getElementById('threat-queue');
+
+  const visible = activeBandits.filter(b => b.detected || b.status === 'decoy_pending');
+  if(visible.length === 0) {
+    if(gamePhase === 'combat') {
+      queue.innerHTML = '<div style="padding:16px;color:var(--dim);font-size:10px;text-align:center">Scanning for threats...</div>';
+    }
+    return;
+  }
+
+  // Sort by ETA (closest to target first)
+  const sorted = [...visible].sort((a,b) => a.distanceRemaining - b.distanceRemaining);
+
+  queue.innerHTML = '';
+  sorted.forEach(b => {
+    const etaSecs = b.speedMapPerSec > 0 ? Math.round(b.distanceRemaining / b.speedMapPerSec) : 999;
+    const priority = b.type === 'kinzhal' || b.type === 'iskander' ? 'high' : b.type === 'iskander_k' || b.type === 'cruise' ? 'medium' : 'low';
+    const isDestroyed = b.status === 'destroyed';
+    const isImpact = b.status === 'impact';
+    const isPending = b.status === 'decoy_pending';
+
+    const card = document.createElement('div');
+    card.className = `threat-card ${isPending ? 'low' : priority} ${isDestroyed ? 'destroyed' : ''} ${b.displayAsDecoy ? 'decoy-confirmed' : ''}`;
+
+    let statusHtml = '';
+    if(isPending) statusHtml = '<div class="threat-status status-detected">⏳ CLASSIFYING... (3s)</div>';
+    else if(isDestroyed) statusHtml = '<div class="threat-status status-hit">✅ DESTROYED</div>';
+    else if(isImpact) statusHtml = '<div class="threat-status status-impact">💥 IMPACT!</div>';
+    else if(b.status === 'engaged') statusHtml = '<div class="threat-status status-engaged">🎯 ENGAGED</div>';
+    else if(b.displayAsDecoy) statusHtml = '<div class="threat-status status-decoy">👻 CONFIRMED DECOY</div>';
+    else statusHtml = '<div class="threat-status status-detected">⚠ DETECTED</div>';
+
+    const etaClass = etaSecs < 30 ? '' : etaSecs < 90 ? 'safe' : 'far';
+    const canEngage = !isDestroyed && !isImpact && b.status !== 'engaged' && !isPending;
+
+    let engageHtml = '';
+    if(canEngage) {
+      // Build asset options
+      const assetOpts = placedAssets.map(pa => {
+        const distKm = Math.hypot((b.x - pa.x)*600, (b.y - pa.y)*600);
+        const inRange = distKm <= pa.asset.range;
+        const correct = isCorrectWeapon(b.type, pa.asset.type);
+        const outAmmo = pa.asset.ammo <= 0;
+        const label = `${pa.asset.icon} ${pa.asset.name} ($${(pa.asset.costPerShot/1000).toFixed(0)}K) ${correct?'✓':'⚠'} ${inRange ? distKm.toFixed(0)+'km':'OUT OF RANGE'} ${outAmmo?'[EMPTY]':''}`;
+        return `<option value="${pa.assetId}" ${(!inRange||outAmmo)?'disabled':''}>${label}</option>`;
+      }).join('');
+
+      engageHtml = `
+        <select id="sel-${b.id}" style="width:100%;background:var(--panel2);color:var(--white);border:1px solid var(--border);padding:4px;font-family:var(--font-mono);font-size:9px;margin-bottom:4px">
+          <option value="">-- Select weapon --</option>
+          ${assetOpts}
+        </select>
+        <button class="engage-btn" onclick="fireFromCard('${b.id}')">⚡ ENGAGE</button>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="threat-id">${b.id}</div>
+      <div class="threat-name">${typeLabel(b.type).split(' ').slice(0,2).join(' ')} — ${b.name}</div>
+      <div class="threat-target">→ ${TARGETS[b.targetIdx].shortName}</div>
+      <div class="threat-eta ${etaClass}">ETA: ${etaSecs > 999 ? '—' : etaSecs + 's'}</div>
+      ${statusHtml}
+      <div class="recommend-badge">BEST WEAPON: <span>${getRecommendedAsset(b)}</span></div>
+      ${engageHtml}
+    `;
+    queue.appendChild(card);
+  });
+}
+
+function fireFromCard(banditId) {
+  const sel = document.getElementById('sel-' + banditId);
+  if(!sel || !sel.value) { addLog('info','Select a weapon first!'); return; }
+  engageBandit(banditId, sel.value);
+}
+
+// ==================== WIN CHECK ====================
+function checkWinCondition() {
+  const allDone = activeBandits.every(b => b.status === 'destroyed' || b.status === 'impact');
+  if(!allDone) return;
+
+  // Check if any more to spawn
+  // Simple: after 90 secs in combat, check
+  if(clockSecs < 10) return;
+
+  clearInterval(clockInterval);
+  gamePhase = 'result';
+  canvas.removeEventListener('mousemove', handleMapHover);
+  setTimeout(() => showResult(), 1000);
+}
+
+// ==================== RESULTS ====================
+function showResult() {
+  const alive = STATE.targetsAlive.filter(Boolean).length;
+  const allDestroyed = activeBandits.filter(b => b.status === 'destroyed').length;
+  const allBandits2 = activeBandits.filter(b => !b.isDecoy).length;
+  const pct = allBandits2 > 0 ? Math.round((allDestroyed / allBandits2)*100) : 100;
+  const timeBonus = clockSecs <= 900;
+  const underBudget = budgetSpent <= missionData.budgetLimit;
+  const targetsOk = alive >= missionData.minTargetsSurvive;
+
+  // Rank
+  let rank = 'F';
+  if(targetsOk && underBudget && pct >= 90) rank = 'S';
+  else if(targetsOk && underBudget && pct >= 75) rank = 'A';
+  else if(targetsOk && pct >= 60) rank = 'B';
+  else rank = 'F';
+
+  let finalScore = score;
+  if(timeBonus && rank !== 'F') finalScore = Math.round(finalScore * 1.2);
+
+  // Save
+  const prev = STATE.scores[STATE.currentMission];
+  if(!prev || finalScore > prev.score) {
+    STATE.scores[STATE.currentMission] = { rank, score: finalScore };
+    localStorage.setItem('bsScores', JSON.stringify(STATE.scores));
+  }
+  if(targetsOk && !STATE.completedMissions.includes(STATE.currentMission)) {
+    STATE.completedMissions.push(STATE.currentMission);
+    localStorage.setItem('bsCompleted', JSON.stringify(STATE.completedMissions));
+  }
+
+  showScreen('result-screen');
+
+  document.getElementById('result-rank').className = 'result-rank ' + rank.toLowerCase();
+  document.getElementById('result-rank').textContent = rank;
+  document.getElementById('result-mission').textContent = `MISSION ${STATE.currentMission}: ${missionData.name} — ${rank === 'F' ? 'FAILED' : 'COMPLETE'}`;
+
+  document.getElementById('result-stats').innerHTML = `
+    <div class="result-stat">
+      <div class="result-stat-label">FINAL SCORE</div>
+      <div class="result-stat-value ${rank !== 'F' ? 'good' : 'bad'}">${finalScore.toLocaleString()}</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">TARGETS SURVIVED</div>
+      <div class="result-stat-value ${alive >= missionData.minTargetsSurvive ? 'good' : 'bad'}">${alive} / 5</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">THREATS NEUTRALIZED</div>
+      <div class="result-stat-value">${pct}%</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">BUDGET SPENT</div>
+      <div class="result-stat-value ${underBudget ? 'good' : 'bad'}">$${formatMoney(budgetSpent)}</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">TIME BONUS</div>
+      <div class="result-stat-value ${timeBonus ? 'good' : ''}">${timeBonus ? '+20%' : 'NONE'}</div>
+    </div>
+    <div class="result-stat">
+      <div class="result-stat-label">BUDGET LIMIT</div>
+      <div class="result-stat-value">$${(missionData.budgetLimit/1e6)}M</div>
+    </div>
+  `;
+
+  const nextBtn = document.getElementById('next-mission-btn');
+  const nextMission = STATE.currentMission + 1;
+  if(nextMission <= 3 && targetsOk) {
+    nextBtn.style.display = 'block';
+    nextBtn.textContent = `▶ MISSION ${nextMission}`;
+  } else {
+    nextBtn.style.display = 'none';
+  }
+}
+
+function goNextMission() {
+  startMission(STATE.currentMission + 1);
+}
+
+// ==================== DRAWING ====================
+function drawMap() {
+  if(!ctx) return;
+  ctx.clearRect(0,0,cw,ch);
+
+  // Background
+  ctx.fillStyle = '#030c06';
+  ctx.fillRect(0,0,cw,ch);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(0,255,136,0.04)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=30;i++) {
+    ctx.beginPath(); ctx.moveTo(i*cw/30,0); ctx.lineTo(i*cw/30,ch); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*ch/30); ctx.lineTo(cw,i*ch/30); ctx.stroke();
+  }
+
+  // Ukraine outline (simplified polygon)
+  drawUkraineOutline();
+
+  // Radar circles
+  placedRadars.forEach(r => {
+    const px = r.x * cw, py = r.y * ch;
+    const radiusPx = (100/600) * cw;
+    ctx.strokeStyle = 'rgba(0,255,136,0.15)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.arc(px, py, radiusPx, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    // Radar fill
+    const grad = ctx.createRadialGradient(px,py,0,px,py,radiusPx);
+    grad.addColorStop(0,'rgba(0,255,136,0.05)');
+    grad.addColorStop(1,'rgba(0,255,136,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(px,py,radiusPx,0,Math.PI*2); ctx.fill();
+    // Radar icon
+    ctx.fillStyle = '#00ff88';
+    ctx.font = '14px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('📡', px, py+5);
+    // Sweep animation
+    const sweepAngle = (Date.now()/1000) % (Math.PI*2);
+    ctx.strokeStyle = 'rgba(0,255,136,0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(px,py);
+    ctx.arc(px,py,radiusPx, sweepAngle, sweepAngle+0.4);
+    ctx.stroke();
+  });
+
+  // Asset range rings
+  placedAssets.forEach(pa => {
+    const px = pa.x * cw, py = pa.y * ch;
+    const radiusPx = (pa.asset.range/600) * cw;
+    ctx.strokeStyle = 'rgba(0,170,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2,6]);
+    ctx.beginPath(); ctx.arc(px,py,radiusPx,0,Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    // Asset icon
+    ctx.font = '16px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(pa.asset.icon, px, py+5);
+    // Name
+    ctx.fillStyle = 'rgba(200,232,208,0.6)';
+    ctx.font = '9px Share Tech Mono';
+    ctx.fillText(pa.asset.name.substring(0,10), px, py+18);
+  });
+
+  // Hover preview for tool placement
+  if(selectedTool && hoverPos) {
+    const px = hoverPos.x * cw, py = hoverPos.y * ch;
+    if(selectedTool === 'radar') {
+      const r = (100/600)*cw;
+      ctx.strokeStyle = 'rgba(0,255,136,0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      const a = missionData.assets.find(x => x.id === selectedTool);
+      if(a) {
+        const r = (a.range/600)*cw;
+        ctx.strokeStyle = 'rgba(0,170,255,0.5)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2,6]);
+        ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+
+  // Missile trails
+  missileTrails = missileTrails.filter(t => t.alpha > 0);
+  missileTrails.forEach(t => {
+    ctx.strokeStyle = `rgba(0,170,255,${t.alpha})`;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.moveTo(t.x1*cw, t.y1*ch);
+    ctx.lineTo(t.x2*cw, t.y2*ch);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    t.alpha -= 0.05;
+  });
+
+  // Targets
+  TARGETS.forEach((t, i) => {
+    const px = t.x * cw, py = t.y * ch;
+    const alive = STATE.targetsAlive[i];
+    ctx.font = '18px serif';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = alive ? 1 : 0.3;
+    ctx.fillText('⚡', px, py+6);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = alive ? '#00ff88' : '#ff3333';
+    ctx.font = 'bold 9px Share Tech Mono';
+    ctx.fillText(t.shortName, px, py+18);
+    // Pulse ring on alive targets
+    if(alive) {
+      const pulse = (Math.sin(Date.now()/800)+1)*0.5;
+      ctx.strokeStyle = `rgba(0,255,136,${pulse*0.3})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(px, py, 12+pulse*4, 0, Math.PI*2); ctx.stroke();
+    }
+  });
+
+  // Axis labels
+  Object.entries(AXES).forEach(([key, axis]) => {
+    const px = Math.max(20, Math.min(cw-20, axis.x*cw));
+    const py = Math.max(20, Math.min(ch-20, axis.y*ch));
+    ctx.fillStyle = axis.color;
+    ctx.font = 'bold 10px Share Tech Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(axis.label, px, py);
+    // Arrow pointing inward
+    ctx.strokeStyle = axis.color;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    const innerX = 0.5*cw, innerY = 0.5*ch;
+    const len = 30;
+    const dx = innerX - px, dy = innerY - py;
+    const d = Math.hypot(dx,dy);
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px + dx/d*len, py + dy/d*len);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // Bandits
+  activeBandits.forEach(b => {
+    if(b.status === 'impact') return;
+    const px = b.x * cw, py = b.y * ch;
+    const alive = b.status !== 'destroyed';
+    if(!alive) {
+      // Fade out explosion remnant
+      return;
+    }
+
+    const isDetected = b.detected;
+
+    // Trail (only if detected)
+    if(isDetected && b.trail.length > 1) {
+      ctx.strokeStyle = b.isDecoy && b.displayAsDecoy ? 'rgba(100,100,100,0.3)' : `rgba(${hexToRgb(b.color)},0.2)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      b.trail.forEach((p,i) => {
+        if(i===0) ctx.moveTo(p.x*cw, p.y*ch);
+        else ctx.lineTo(p.x*cw, p.y*ch);
+      });
+      ctx.stroke();
+    }
+
+    // Draw bandit dot
+    if(isDetected) {
+      const col = b.displayAsDecoy ? '#555' : b.color;
+      ctx.fillStyle = col;
+      ctx.shadowColor = col;
+      ctx.shadowBlur = b.type === 'kinzhal' ? 12 : 4;
+      ctx.beginPath();
+      const sz = b.type === 'kinzhal' ? 6 : b.type === 'iskander' || b.type === 'iskander_k' ? 5 : 3;
+      ctx.arc(px, py, sz, 0, Math.PI*2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // Label
+      ctx.fillStyle = b.displayAsDecoy ? '#666' : '#fff';
+      ctx.font = '8px Share Tech Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(b.name, px+8, py+3);
+
+      // Flight path line
+      ctx.strokeStyle = `rgba(${hexToRgb(b.color)},0.15)`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([2,4]);
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(b.targetX*cw, b.targetY*ch);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      // Undetected: no draw (fog of war)
+    }
+  });
+
+  // Explosions
+  explosions = explosions.filter(e => e.alpha > 0);
+  explosions.forEach(e => {
+    const px = e.x*cw, py = e.y*ch;
+    e.r += 0.003;
+    e.alpha -= 0.02;
+    const col = e.type === 'big' ? '255,51,51' : '255,200,0';
+    const grad = ctx.createRadialGradient(px,py,0,px,py,e.r*cw);
+    grad.addColorStop(0, `rgba(${col},${e.alpha})`);
+    grad.addColorStop(1, `rgba(${col},0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(px, py, e.r*cw, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  ctx.textAlign = 'left';
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function drawUkraineOutline() {
+  // Simplified Ukraine border polygon (normalized 0-1 coordinates)
+  const outline = [
+    [0.22,0.05],[0.35,0.02],[0.48,0.0],[0.62,0.03],[0.75,0.08],[0.85,0.12],[0.95,0.18],
+    [1.0,0.28],[0.98,0.38],[0.92,0.45],[0.88,0.52],[0.82,0.6],[0.78,0.68],[0.72,0.75],
+    [0.65,0.8],[0.58,0.85],[0.5,0.9],[0.42,0.92],[0.35,0.88],[0.28,0.82],[0.22,0.75],
+    [0.15,0.68],[0.1,0.6],[0.06,0.5],[0.04,0.4],[0.08,0.3],[0.14,0.2],[0.2,0.1],[0.22,0.05]
+  ];
+  ctx.strokeStyle = 'rgba(0,255,136,0.12)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  outline.forEach((pt,i) => {
+    if(i===0) ctx.moveTo(pt[0]*cw, pt[1]*ch);
+    else ctx.lineTo(pt[0]*cw, pt[1]*ch);
+  });
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(0,255,136,0.02)';
+  ctx.fill();
+}
+
+// ==================== PHASE BADGE ====================
+function setPhaseBadge(p) {
+  const el = document.getElementById('phase-badge');
+  el.className = 'phase-badge ' + p;
+  const labels = { deploy:'DEPLOY PHASE', combat:'⚡ COMBAT ACTIVE', victory:'VICTORY', defeat:'MISSION FAILED' };
+  el.textContent = labels[p] || p;
+}
+
+// ==================== LOG ====================
+function clearLog() {
+  document.getElementById('bottom-log').innerHTML = '';
+}
+function addLog(type, msg) {
+  const m = String(Math.floor(clockSecs/60)).padStart(2,'0');
+  const s = String(clockSecs%60).padStart(2,'0');
+  const log = document.getElementById('bottom-log');
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="log-time">[${m}:${s}]</span><span class="log-${type}">${msg}</span>`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ==================== UTILS ====================
+function formatMoney(n) {
+  if(n >= 1e9) return (n/1e9).toFixed(1)+'B';
+  if(n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if(n >= 1e3) return (n/1e3).toFixed(0)+'K';
+  return n.toString();
+}
+
+// ==================== INIT ====================
+updateMissionScreen();
+
+// Prevent right-click
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+</body>
+</html>
